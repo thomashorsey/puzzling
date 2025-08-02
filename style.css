@@ -1,0 +1,78 @@
+/* Fonts */
+body {
+    font-family: "Jost", sans-serif;
+    color: black;
+}
+
+h2 {
+    padding: 0;
+    margin: 0;
+}
+
+/* Body */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+} 
+
+/* Header */
+header {
+    padding: 10px;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+/* Main */
+main {
+    flex: 1 0 auto;
+}
+
+/* Board */
+#board {
+    height: 300px;
+    width: 400px;
+    background-color: lightgrey;
+    position: absolute; 
+    z-index: 1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Piece */
+.piece {
+    height: 40px;
+    width: 40px;
+    background-color: red;
+    border: 5px solid black;
+    position: absolute;
+    z-index: 2;
+    cursor: grab;
+}
+
+/* Footer */
+footer {
+    padding: 10px;
+    margin: 0px;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+}
+
+footer > div:nth-child(2) {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+footer a {
+    text-decoration: none;
+    color: black;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
