@@ -42,6 +42,24 @@ main {
     transform: translate(-50%, -50%);
 }
 
+/* Instructions */
+#instructions {
+    display: none;
+    height: 300px;
+    width: 400px;
+    background-color: lightgrey;
+    position: absolute; 
+    z-index: 999;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#hideInstructions {
+    cursor: pointer;
+    font-size: 24px;
+}
+
 /* Piece */
 .piece {
     height: 40px;

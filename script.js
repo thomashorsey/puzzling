@@ -3,6 +3,8 @@ const numberOfPieces = 48;
 // A variable to keep track of the currently "picked up" piece
 let activePiece = null;
 
+let highestZIndex = 1;
+
 // Wait for the DOM to be fully loaded before running the script
 document.addEventListener("DOMContentLoaded", () => {
     createAndPlacePieces(numberOfPieces);
@@ -26,32 +28,53 @@ document.addEventListener('keydown', (e) => {
  */
 function createAndPlacePieces(count) {
     const main = document.querySelector("main");
-    const margin = 10; // A small margin to ensure pieces aren't placed at the very edge
+    const mainMargin = 20;
+    const boardMargin = 20;
 
     // Use fixed dimensions from CSS to correctly calculate placement
     const pieceHeight = 40;
     const pieceWidth = 40;
 
-    // Get the dimensions of the main container for accurate placement
     const mainRect = main.getBoundingClientRect();
-    const mainHeight = mainRect.height;
-    const mainWidth = mainRect.width;
+    const boardRect = board.getBoundingClientRect();
 
     for (let i = 0; i < count; i++) {
         const piece = document.createElement("div");
         piece.classList.add("piece");
+
+        // Set the initial z-index to be unique for each piece
+        highestZIndex++;
+        piece.style.zIndex = highestZIndex;
 
         // Generate a random rotation for each piece
         const randomRotation = Math.floor(Math.random() * 360);
         piece.dataset.rotation = randomRotation;
         piece.style.transform = `rotate(${randomRotation}deg)`;
 
-        // Generate random positions based on the main container's size
-        const maxTop = mainHeight - pieceHeight - margin;
-        const maxLeft = mainWidth - pieceWidth - margin;
+        let randomTop, randomLeft;
+        let isOverlapping = true;
 
-        const randomTop = Math.random() * maxTop;
-        const randomLeft = Math.random() * maxLeft;
+        // Keep generating new random positions until one is found that doesn't overlap with the board
+        while (isOverlapping) {
+            randomTop = Math.random() * (mainRect.height - mainMargin - pieceHeight);
+            randomLeft = Math.random() * (mainRect.width - mainMargin - pieceWidth);
+
+            // Calculate the piece's position relative to the viewport for collision detection
+            const pieceTop = mainRect.top + randomTop;
+            const pieceLeft = mainRect.left + randomLeft;
+            const pieceBottom = pieceTop + pieceHeight;
+            const pieceRight = pieceLeft + pieceWidth;
+
+            // Check for overlap with the board's viewport position, now with a margin
+            if (
+                pieceRight < boardRect.left - boardMargin ||
+                pieceLeft > boardRect.right + boardMargin ||
+                pieceBottom < boardRect.top - boardMargin ||
+                pieceTop > boardRect.bottom + boardMargin
+            ) {
+                isOverlapping = false;
+            }
+        }
 
         // Set the piece's position relative to the main container's top-left corner
         piece.style.top = (mainRect.top + randomTop) + 'px';
@@ -73,6 +96,11 @@ function togglePiece(e) {
     if (activePiece === null) {
         // First click: Pick up the piece
         activePiece = clickedPiece;
+
+        // When a piece is picked up, update its z-index to the highest value
+        highestZIndex++;
+        activePiece.style.zIndex = highestZIndex;
+
         // Set cursor to 'grabbing' when the piece is picked up
         activePiece.style.cursor = 'grabbing';
         document.addEventListener('mousemove', moveActivePiece);
@@ -175,4 +203,26 @@ function snapToGrid(pieceEl) {
             pieceEl.style.top = finalTop + "px";
         }
     }
+}
+
+var instructions = document.getElementById("instructions");
+
+var showInstructionsButton = document.getElementById("showInstructions");
+
+showInstructionsButton.onclick = function() {
+    showInstructions();
+}
+
+function showInstructions() {
+    instructions.style.display = "block";
+}
+
+hideInstructionsButton = document.getElementById("hideInstructions")
+
+hideInstructionsButton.onclick = function() {
+    hideInstructions();
+}
+
+function hideInstructions() {
+    instructions.style.display = "none";
 }
