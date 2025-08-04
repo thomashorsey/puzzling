@@ -77,14 +77,14 @@ main {
     background-color: red;
     border: 5px solid black;
     position: absolute;
-    z-index: 2;
+    z-index: 1;
     cursor: grab;
 }
 
 /* Footer */
 footer {
     padding: 10px;
-    margin: 0px;
+    margin: 0;
     position: relative;
     display: flex;
     justify-content: space-between;
