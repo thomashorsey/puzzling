@@ -9,8 +9,63 @@
         <link href="https://fonts.googleapis.com/css2?family=Jost&display=swap" rel="stylesheet">
     </head>
     <body>
+        <svg height="0" width="0">
+            <defs>
+                <mask id="tl" maskContentUnits="objectBoundingBox">
+                    <rect x="0.125" y="0.125" width="0.75" height="0.75" fill="white"></rect>
+                    <circle cx="0.875" cy="0.5" r="0.125" fill="black"></circle>
+                    <circle cx="0.5" cy="0.875" r="0.125" fill="white"></circle>
+                </mask>
+                <mask id="tr" maskContentUnits="objectBoundingBox">
+                    <rect x="0.125" y="0.125" width="0.75" height="0.75" fill="white"></rect>
+                    <circle cx="0.5" cy="0.875" r="0.125" fill="white"></circle>
+                    <circle cx="0.125" cy="0.5" r="0.125" fill="white"></circle>
+                </mask>
+                <mask id="t" maskContentUnits="objectBoundingBox">
+                    <rect x="0.125" y="0.125" width="0.75" height="0.75" fill="white"></rect>
+                    <circle cx="0.875" cy="0.5" r="0.125" fill="black"></circle>
+                    <circle cx="0.5" cy="0.875" r="0.125" fill="white"></circle>
+                    <circle cx="0.125" cy="0.5" r="0.125" fill="white"></circle>
+                </mask>
+                <mask id="bl" maskContentUnits="objectBoundingBox">
+                    <rect x="0.125" y="0.125" width="0.75" height="0.75" fill="white"></rect>
+                    <circle cx="0.5" cy="0.125" r="0.125" fill="black"></circle>
+                    <circle cx="0.875" cy="0.5" r="0.125" fill="black"></circle>
+                </mask>
+                <mask id="br" maskContentUnits="objectBoundingBox">
+                    <rect x="0.125" y="0.125" width="0.75" height="0.75" fill="white"></rect>
+                    <circle cx="0.5" cy="0.125" r="0.125" fill="black"></circle>
+                    <circle cx="0.125" cy="0.5" r="0.125" fill="white"></circle>
+                </mask>
+                <mask id="b" maskContentUnits="objectBoundingBox">
+                    <rect x="0.125" y="0.125" width="0.75" height="0.75" fill="white"></rect>
+                    <circle cx="0.5" cy="0.125" r="0.125" fill="black"></circle>
+                    <circle cx="0.875" cy="0.5" r="0.125" fill="black"></circle>
+                    <circle cx="0.125" cy="0.5" r="0.125" fill="white"></circle>
+                </mask>
+                <mask id="ml" maskContentUnits="objectBoundingBox">
+                    <rect x="0.125" y="0.125" width="0.75" height="0.75" fill="white"></rect>
+                    <circle cx="0.5" cy="0.125" r="0.125" fill="black"></circle>
+                    <circle cx="0.875" cy="0.5" r="0.125" fill="black"></circle>
+                    <circle cx="0.5" cy="0.875" r="0.125" fill="white"></circle>
+                </mask>
+                <mask id="mr" maskContentUnits="objectBoundingBox">
+                    <rect x="0.125" y="0.125" width="0.75" height="0.75" fill="white"></rect>
+                    <circle cx="0.5" cy="0.125" r="0.125" fill="black"></circle>
+                    <circle cx="0.5" cy="0.875" r="0.125" fill="white"></circle>
+                    <circle cx="0.125" cy="0.5" r="0.125" fill="white"></circle>
+                </mask>
+                <mask id="m" maskContentUnits="objectBoundingBox">
+                    <rect x="0.125" y="0.125" width="0.75" height="0.75" fill="white"></rect>
+                    <circle cx="0.5" cy="0.125" r="0.125" fill="black"></circle>
+                    <circle cx="0.875" cy="0.5" r="0.125" fill="black"></circle>
+                    <circle cx="0.5" cy="0.875" r="0.125" fill="white"></circle>
+                    <circle cx="0.125" cy="0.5" r="0.125" fill="white"></circle>
+                </mask>
+            </defs>
+        </svg>
         <header>
-            <h2>puzzling</h2>
+            <h2><a href="./">puzzling</a></h2>
         </header>
         <main>
             <div id="board"></div>
