@@ -77,7 +77,6 @@ main {
 
 /* Piece */
 .piece {
-    background-color: black;
     position: absolute;
     z-index: 1;
     cursor: grab;

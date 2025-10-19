@@ -1,7 +1,7 @@
 const ROWS = 6;
 const COLUMNS = 8;
 const PIECE_SIZE = 50;
-const MASK_SIZE_MULTIPLIER = 1 / 1; // 0.75 is the correct scale
+const MASK_SIZE_MULTIPLIER = 1 / 1; // 1 / 0.75 is the correct scale
 const NUMBER_OF_PIECES = ROWS * COLUMNS;
 const BOARD_HEIGHT = ROWS * PIECE_SIZE;
 const BOARD_WIDTH = COLUMNS * PIECE_SIZE;
@@ -14,19 +14,9 @@ const SIDE = {
     LEFT: 3,
 }
 
-const SIDE_OFFSET_HORIZONTAL = {
-    0: 0,
-    1: PIECE_SIZE,
-    2: 0,
-    3: -PIECE_SIZE
-}
+const SIDE_OFFSET_HORIZONTAL = [0, PIECE_SIZE, 0, -PIECE_SIZE];
 
-const SIDE_OFFSET_VERTICAL = {
-    0: -PIECE_SIZE,
-    1: 0,
-    2: PIECE_SIZE,
-    3: 0
-}
+const SIDE_OFFSET_VERTICAL = [-PIECE_SIZE, 0, PIECE_SIZE, 0];
 
 const SIDE_TYPE = {
     FLAT: 'FLAT',
@@ -55,25 +45,23 @@ const PIECE_TYPE_SIDES = {
 let highestZIndex = 1;
 let activePiece = null;
 
-document.addEventListener("DOMContentLoaded", () => {
-    const instructions = document.getElementById("instructions");
-    const showInstructionsButton = document.getElementById("showInstructions");
-    const hideInstructionsButton = document.getElementById("hideInstructions");
-
+document.addEventListener('DOMContentLoaded', () => {
+    const board = document.getElementById('board');
     board.style.height = `${BOARD_HEIGHT}px`;
     board.style.width = `${BOARD_WIDTH}px`;
 
+    const instructions = document.getElementById('instructions');
     instructions.style.height = `${BOARD_HEIGHT}px`;
     instructions.style.width = `${BOARD_WIDTH}px`;
 
     createAndPlacePieces(NUMBER_OF_PIECES);
 
-    showInstructionsButton.addEventListener('click', () => {
-        instructions.style.display = "block";
+    document.getElementById('showInstructions').addEventListener('click', () => {
+        instructions.style.display = 'block';
     });
 
-    hideInstructionsButton.addEventListener('click', () => {
-        instructions.style.display = "none";
+    document.getElementById('hideInstructions').addEventListener('click', () => {
+        instructions.style.display = 'none';
     });
 });
 
@@ -92,13 +80,17 @@ function getPieceType(row, column) {
     const isLeft =  column === 0;
     const isRight = column === COLUMNS - 1;
 
-    if (isTop && isLeft) return 'tl';
-    if (isTop && isRight) return 'tr';
-    if (isTop) return 't';
+    if (isTop) {
+        if (isLeft) return 'tl';
+        if(isRight) return 'tr';
+        return 't';
+    }
 
-    if (isBottom && isLeft) return 'bl';
-    if (isBottom && isRight) return'br';
-    if (isBottom) return 'b';
+    if (isBottom) {
+        if (isLeft) return 'bl';
+        if (isRight) return'br';
+        return 'b';
+    }
 
     if (isLeft) return 'ml';
     if (isRight) return 'mr';
@@ -139,24 +131,32 @@ function getRandomNonOverlappingPosition(mainRect, boardRect, pieceSize) {
 }
 
 function createAndPlacePieces(count) {
-    const main = document.querySelector("main");
-    const board = document.getElementById("board");
+    const main = document.querySelector('main');
+    const board = document.getElementById('board');
 
     const mainRect = main.getBoundingClientRect();
     const boardRect = board.getBoundingClientRect();
 
     for (let i = 0; i < count; i++) {
-        const piece = document.createElement("div");
-        piece.classList.add("piece");
+        const piece = document.createElement('div');
+        piece.classList.add('piece');
 
         piece.style.height = `${Math.ceil(PIECE_SIZE * MASK_SIZE_MULTIPLIER)}px`;
         piece.style.width = `${Math.ceil(PIECE_SIZE * MASK_SIZE_MULTIPLIER)}px`;
 
         const row = Math.floor(i / COLUMNS);
         const column = i % COLUMNS;
+
         const pieceType = getPieceType(row, column)
         piece.dataset.pieceType = pieceType;
         piece.style.maskImage = `url(#${pieceType})`;
+
+        piece.style.backgroundImage = `url('background.jpg')`;
+        piece.style.backgroundRepeat = 'no-repeat';
+        piece.style.backgroundSize = `${BOARD_WIDTH}px ${BOARD_HEIGHT}px`;
+        const backgroundPosX = -column * PIECE_SIZE;
+        const backgroundPosY = -row * PIECE_SIZE;
+        piece.style.backgroundPosition = `${backgroundPosX}px ${backgroundPosY}px`;
 
         highestZIndex++;
         piece.style.zIndex = highestZIndex;
@@ -237,7 +237,7 @@ function isPositionOffTheBoard(targetLeft, targetTop, boardRect) {
 }
 
 function getPieceInPosition(targetLeft, targetTop) {
-    const pieces = document.querySelectorAll(".piece");
+    const pieces = document.querySelectorAll('.piece');
     for (const piece of pieces) {
         const pieceRect = piece.getBoundingClientRect();
         if (pieceRect.left === targetLeft && pieceRect.top === targetTop) {
@@ -248,7 +248,7 @@ function getPieceInPosition(targetLeft, targetTop) {
 }
 
 function getPieceSideType(piece, side) {
-    const rotationOffset = (piece.dataset.rotation / 90) % 360;
+    const rotationOffset = (piece.dataset.rotation / 90) % 4;
     const pieceSideTypes = PIECE_TYPE_SIDES[piece.dataset.pieceType];
 
     return pieceSideTypes.at(side - rotationOffset);
@@ -286,7 +286,7 @@ function isPositionValid(piece, targetLeft, targetTop, boardRect) {
 }
 
 function isPositionEmpty(piece, targetLeft, targetTop) {
-    const pieces = document.querySelectorAll(".piece");
+    const pieces = document.querySelectorAll('.piece');
     for (const otherPiece of pieces) {
         if (otherPiece === piece) {
             continue;
@@ -301,7 +301,7 @@ function isPositionEmpty(piece, targetLeft, targetTop) {
 }
 
 function snapToGrid(piece) {
-    const board = document.getElementById("board");
+    const board = document.getElementById('board');
 
     const boardRect = board.getBoundingClientRect();
     const pieceRect = piece.getBoundingClientRect();
