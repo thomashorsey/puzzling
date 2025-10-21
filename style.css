@@ -75,6 +75,10 @@ main {
     right: 10px;
 }
 
+#uploadButton {
+    text-decoration: underline;
+}
+
 /* Piece */
 .piece {
     position: absolute;

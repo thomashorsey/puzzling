@@ -52,13 +52,12 @@ document.addEventListener('DOMContentLoaded', () => {
     instructions.style.height = `${BOARD_HEIGHT}px`;
     instructions.style.width = `${BOARD_WIDTH}px`;
 
-    createAndPlacePieces(NUMBER_OF_PIECES);
-
     const visited = localStorage.getItem('previousPuzzler');
-
     if (!visited) {
         instructions.style.display = 'block';
     }
+
+    createAndPlacePieces(NUMBER_OF_PIECES);
 
     document.getElementById('showInstructions').addEventListener('click', () => {
         instructions.style.display = 'block';
@@ -68,7 +67,24 @@ document.addEventListener('DOMContentLoaded', () => {
         instructions.style.display = 'none';
         localStorage.setItem('previousPuzzler', 'true');
     });
+
+    const uploadInput = document.getElementById('imageUpload');
+    document.getElementById('uploadButton').addEventListener('click', (e) => {
+        e.preventDefault(); 
+        uploadInput.click(); 
+    });
+    uploadInput.addEventListener('change', handleImageUpload);
 });
+
+function handleImageUpload(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const imageUrl = URL.createObjectURL(file);
+        document.querySelectorAll('.piece').forEach(piece => {
+            piece.style.backgroundImage = `url('${imageUrl}')`;
+        });
+    }
+}
 
 document.addEventListener('keydown', (e) => {
     if (e.key === 'r' && activePiece) {
