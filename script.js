@@ -6,6 +6,8 @@ const NUMBER_OF_PIECES = ROWS * COLUMNS;
 const BOARD_HEIGHT = ROWS * PIECE_SIZE;
 const BOARD_WIDTH = COLUMNS * PIECE_SIZE;
 const MARGIN = PIECE_SIZE / 2;
+const SIDE_OFFSET_HORIZONTAL = [0, PIECE_SIZE, 0, -PIECE_SIZE];
+const SIDE_OFFSET_VERTICAL = [-PIECE_SIZE, 0, PIECE_SIZE, 0];
 
 const SIDE = {
     TOP: 0,
@@ -13,10 +15,6 @@ const SIDE = {
     BOTTOM: 2,
     LEFT: 3,
 }
-
-const SIDE_OFFSET_HORIZONTAL = [0, PIECE_SIZE, 0, -PIECE_SIZE];
-
-const SIDE_OFFSET_VERTICAL = [-PIECE_SIZE, 0, PIECE_SIZE, 0];
 
 const SIDE_TYPE = {
     FLAT: 'FLAT',
@@ -56,12 +54,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     createAndPlacePieces(NUMBER_OF_PIECES);
 
+    const visited = localStorage.getItem('previousPuzzler');
+
+    if (!visited) {
+        instructions.style.display = 'block';
+    }
+
     document.getElementById('showInstructions').addEventListener('click', () => {
         instructions.style.display = 'block';
     });
 
     document.getElementById('hideInstructions').addEventListener('click', () => {
         instructions.style.display = 'none';
+        localStorage.setItem('previousPuzzler', 'true');
     });
 });
 
