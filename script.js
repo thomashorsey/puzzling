@@ -14,19 +14,19 @@ const SIDE = {
     RIGHT: 1,
     BOTTOM: 2,
     LEFT: 3,
-}
+};
 
 const SIDE_TYPE = {
     FLAT: 'FLAT',
     TAB: 'TAB',
     BLANK: 'BLANK'
-}
+};
 
 const COMPATIBLE_SIDE_TYPE = {
     FLAT: SIDE_TYPE.FLAT,
     TAB: SIDE_TYPE.BLANK,
     BLANK: SIDE_TYPE.TAB
-}
+};
 
 const PIECE_TYPE_SIDES = {
     tl: [SIDE_TYPE.FLAT, SIDE_TYPE.BLANK, SIDE_TYPE.TAB, SIDE_TYPE.FLAT],
@@ -38,7 +38,7 @@ const PIECE_TYPE_SIDES = {
     ml: [SIDE_TYPE.BLANK, SIDE_TYPE.BLANK, SIDE_TYPE.TAB, SIDE_TYPE.FLAT],
     mr: [SIDE_TYPE.BLANK, SIDE_TYPE.FLAT, SIDE_TYPE.TAB, SIDE_TYPE.TAB],
     m: [SIDE_TYPE.BLANK, SIDE_TYPE.BLANK, SIDE_TYPE.TAB, SIDE_TYPE.TAB]
-}
+};
 
 let highestZIndex = 1;
 let activePiece = null;
@@ -172,7 +172,7 @@ function createAndPlacePieces(count) {
         piece.dataset.pieceType = pieceType;
         piece.style.maskImage = `url(#${pieceType})`;
 
-        piece.style.backgroundImage = `url('background.jpg')`;
+        piece.style.backgroundImage = `url('default.jpg')`;
         piece.style.backgroundRepeat = 'no-repeat';
         piece.style.backgroundSize = `${BOARD_WIDTH}px ${BOARD_HEIGHT}px`;
         const backgroundPosX = -column * PIECE_SIZE;
