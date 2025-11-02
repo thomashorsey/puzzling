@@ -63,16 +63,16 @@ main {
     flex-direction: column;
 }
 
-#instructions h2, p {
+#instructions h3, p {
     margin: 0;
 }
 
 #hideInstructions {
     cursor: pointer;
-    font-size: 36px;
+    font-size: 24px;
     position: absolute;
-    top: -4px;
-    right: 14px;
+    top: -1px;
+    right: 12px;
 }
 
 #imageUpload {
