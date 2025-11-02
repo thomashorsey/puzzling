@@ -1,15 +1,15 @@
 <!doctype html>
-<html lang="en-US">
+<html lang="en">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>puzzling</title>
         <link rel="icon" type="image/x-icon" href="/images/favicon.png">
-        <link rel="stylesheet" href="style.css">
         <link href="https://fonts.googleapis.com/css2?family=Jost&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <svg height="0" width="0">
+        <svg>
             <defs>
                 <mask id="tl" maskContentUnits="objectBoundingBox">
                     <rect x="0.125" y="0.125" width="0.75" height="0.75" fill="white"></rect>
@@ -65,16 +65,21 @@
             </defs>
         </svg>
         <header>
-            <h2><a href="./">puzzling</a></h2>
+            <h1><a href="./">puzzling</a></h1>
         </header>
         <main>
             <div id="board"></div>
             <div id="instructions">
-                <h3 id="hideInstructions">&times;</h3>
-                <h3>Instructions</h3>
+                <h2 id="hideInstructions">&times;</h2>
+                <h2>Instructions</h2>
                 <p>- 
-                    <input type="file" id="imageUpload" accept="image/*" style="display: none;">
-                    <a href="#" id="uploadButton">Upload</a> your own photo (optional)
+                    <input type="file" id="imageUpload" accept="image/*">
+                    <a id="uploadButton">Upload</a> your own photo
+                </p>
+                <p>- Adjust the difficulty 
+                    (<button id="easyButton" class="difficultyButton">Easy</button>, 
+                    <button id="mediumButton" class="difficultyButton">Medium</button>, 
+                    or <button id="hardButton" class="difficultyButton">Hard</button>)
                 </p>
                 <p>- Click a piece to pick it up</p>
                 <p>- Use the cursor to position it</p>

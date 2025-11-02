@@ -4,7 +4,7 @@ body {
     color: black;
 }
 
-h2 {
+h1 {
     padding: 0;
     margin: 0;
 }
@@ -54,7 +54,7 @@ main {
     display: none;
     background-color: lightgrey;
     position: absolute; 
-    z-index: 1;
+    z-index: 999;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -63,20 +63,41 @@ main {
     flex-direction: column;
 }
 
-#instructions h3, p {
+#instructions h2, p {
     margin: 0;
 }
 
 #hideInstructions {
     cursor: pointer;
-    font-size: 24px;
+    font-size: 36px;
     position: absolute;
-    top: -3px;
-    right: 10px;
+    top: -4px;
+    right: 14px;
+}
+
+#imageUpload {
+    display: none;
 }
 
 #uploadButton {
     text-decoration: underline;
+    font-weight: bold;
+}
+
+.difficultyButton {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    text-decoration: none; 
+}
+
+.difficulty {
+    text-decoration: underline;
+    font-weight: bold;
 }
 
 /* Piece */
@@ -100,4 +121,10 @@ footer > div:nth-child(2) {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+}
+
+/* Masks */
+svg {
+    height: 0;
+    width: 0;
 }

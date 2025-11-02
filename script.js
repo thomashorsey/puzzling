@@ -1,13 +1,22 @@
-const ROWS = 6;
-const COLUMNS = 8;
-const PIECE_SIZE = 50;
 const MASK_SIZE_MULTIPLIER = 1 / 1; // 1 / 0.75 is the correct scale
-const NUMBER_OF_PIECES = ROWS * COLUMNS;
-const BOARD_HEIGHT = ROWS * PIECE_SIZE;
-const BOARD_WIDTH = COLUMNS * PIECE_SIZE;
-const MARGIN = PIECE_SIZE / 2;
-const SIDE_OFFSET_HORIZONTAL = [0, PIECE_SIZE, 0, -PIECE_SIZE];
-const SIDE_OFFSET_VERTICAL = [-PIECE_SIZE, 0, PIECE_SIZE, 0];
+
+const DIFFICULTY = {
+    EASY: {
+        ROWS: 3,
+        COLUMNS: 4,
+        PIECE_SIZE: 128
+    },
+    MEDIUM: {
+        ROWS: 6,
+        COLUMNS: 8,
+        PIECE_SIZE: 64
+    },
+    HARD: {
+        ROWS: 12,
+        COLUMNS: 16,
+        PIECE_SIZE: 32
+    }
+};
 
 const SIDE = {
     TOP: 0,
@@ -40,24 +49,21 @@ const PIECE_TYPE_SIDES = {
     m: [SIDE_TYPE.BLANK, SIDE_TYPE.BLANK, SIDE_TYPE.TAB, SIDE_TYPE.TAB]
 };
 
-let highestZIndex = 1;
-let activePiece = null;
+let rows;
+let columns;
+let pieceSize;
+let numberOfPieces;
+let boardHeight;
+let boardWidth;
+let margin;
+let sideOffsetHorizontal;
+let sideOffsetVertical;
+let highestZIndex;
+let activePiece;
 
 document.addEventListener('DOMContentLoaded', () => {
-    const board = document.getElementById('board');
-    board.style.height = `${BOARD_HEIGHT}px`;
-    board.style.width = `${BOARD_WIDTH}px`;
 
     const instructions = document.getElementById('instructions');
-    instructions.style.height = `${BOARD_HEIGHT}px`;
-    instructions.style.width = `${BOARD_WIDTH}px`;
-
-    const visited = localStorage.getItem('previousPuzzler');
-    if (!visited) {
-        instructions.style.display = 'block';
-    }
-
-    createAndPlacePieces(NUMBER_OF_PIECES);
 
     document.getElementById('showInstructions').addEventListener('click', () => {
         instructions.style.display = 'block';
@@ -65,8 +71,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('hideInstructions').addEventListener('click', () => {
         instructions.style.display = 'none';
-        localStorage.setItem('previousPuzzler', 'true');
+        localStorage.setItem('showInstructions', 'none');
     });
+
+    instructions.style.display = localStorage.getItem('showInstructions') ?? 'block';
 
     const uploadInput = document.getElementById('imageUpload');
     document.getElementById('uploadButton').addEventListener('click', (e) => {
@@ -74,16 +82,80 @@ document.addEventListener('DOMContentLoaded', () => {
         uploadInput.click(); 
     });
     uploadInput.addEventListener('change', handleImageUpload);
+
+    document.getElementById('easyButton').addEventListener('click', () => {
+        initializeGame(localStorage.getItem('backgroundImage') ?? '/images/default.jpg', 'EASY');
+        localStorage.setItem('difficulty', 'EASY');
+    });
+
+    document.getElementById('mediumButton').addEventListener('click', () => {
+        initializeGame(localStorage.getItem('backgroundImage') ?? '/images/default.jpg', 'MEDIUM');
+        localStorage.setItem('difficulty', 'MEDIUM');
+    });
+
+    document.getElementById('hardButton').addEventListener('click', () => {
+        initializeGame(localStorage.getItem('backgroundImage') ?? '/images/default.jpg', 'HARD');
+        localStorage.setItem('difficulty', 'HARD');
+    });
+
+    initializeGame(localStorage.getItem('backgroundImage') ?? '/images/default.jpg', localStorage.getItem('difficulty') ?? 'MEDIUM');
 });
 
 function handleImageUpload(e) {
     const file = e.target.files[0];
     if (file) {
-        const imageUrl = URL.createObjectURL(file);
+        const backgroundImage = URL.createObjectURL(file);
         document.querySelectorAll('.piece').forEach(piece => {
-            piece.style.backgroundImage = `url('${imageUrl}')`;
+            piece.style.backgroundImage = `url('${backgroundImage}')`;
         });
+        localStorage.setItem('backgroundImage', backgroundImage);
     }
+}
+
+function initializeGame(backgroundImage, difficulty) {
+    const difficultySettings = DIFFICULTY[difficulty];
+
+    rows = difficultySettings.ROWS;
+    columns = difficultySettings.COLUMNS;
+    pieceSize = difficultySettings.PIECE_SIZE;
+    numberOfPieces = rows * columns;
+    boardHeight = rows * pieceSize;
+    boardWidth = columns * pieceSize;
+    margin = pieceSize / 2;
+    sideOffsetHorizontal = [0, pieceSize, 0, -pieceSize];
+    sideOffsetVertical = [-pieceSize, 0, pieceSize, 0];
+    highestZIndex = 1;
+    activePiece = null;
+
+    updateDifficultyButtons(difficulty);
+
+    document.querySelectorAll('.piece').forEach(piece => piece.remove());
+
+    const board = document.getElementById('board');
+    board.style.height = `${boardHeight}px`;
+    board.style.width = `${boardWidth}px`;
+
+    const instructions = document.getElementById('instructions');
+    instructions.style.height = `${boardHeight}px`;
+    instructions.style.width = `${boardWidth}px`;
+
+    createAndPlacePieces(numberOfPieces, backgroundImage);
+}
+
+function updateDifficultyButtons(difficulty) {
+    const buttons = [
+        document.getElementById('easyButton'),
+        document.getElementById('mediumButton'),
+        document.getElementById('hardButton')
+    ];
+
+    buttons.forEach(button => {
+        button.classList.remove('difficulty');
+
+        if (button.id.toUpperCase().includes(difficulty)) {
+            button.classList.add('difficulty');
+        }
+    });
 }
 
 document.addEventListener('keydown', (e) => {
@@ -97,13 +169,13 @@ document.addEventListener('keydown', (e) => {
 
 function getPieceType(row, column) {
     const isTop = row === 0;
-    const isBottom = row === ROWS - 1;
-    const isLeft =  column === 0;
-    const isRight = column === COLUMNS - 1;
+    const isBottom = row === rows - 1;
+    const isLeft = column === 0;
+    const isRight = column === columns - 1;
 
     if (isTop) {
         if (isLeft) return 'tl';
-        if(isRight) return 'tr';
+        if (isRight) return 'tr';
         return 't';
     }
 
@@ -122,8 +194,8 @@ function getRandomNonOverlappingPosition(mainRect, boardRect, pieceSize) {
     let randomTop, randomLeft;
     let isOverlapping = true;
     
-    const maxTop = mainRect.height - MARGIN - pieceSize;
-    const maxLeft = mainRect.width - MARGIN - pieceSize;
+    const maxTop = mainRect.height - margin - pieceSize;
+    const maxLeft = mainRect.width - margin - pieceSize;
 
     while (isOverlapping) {
         randomTop = Math.random() * maxTop;
@@ -134,10 +206,10 @@ function getRandomNonOverlappingPosition(mainRect, boardRect, pieceSize) {
         const pieceBottom = pieceTop + pieceSize;
         const pieceRight = pieceLeft + pieceSize;
 
-        const boardCollisionLeft = boardRect.left - MARGIN;
-        const boardCollisionRight = boardRect.right + MARGIN;
-        const boardCollisionTop = boardRect.top - MARGIN;
-        const boardCollisionBottom = boardRect.bottom + MARGIN;
+        const boardCollisionLeft = boardRect.left - margin;
+        const boardCollisionRight = boardRect.right + margin;
+        const boardCollisionTop = boardRect.top - margin;
+        const boardCollisionBottom = boardRect.bottom + margin;
 
         if (
             pieceRight < boardCollisionLeft ||
@@ -151,32 +223,32 @@ function getRandomNonOverlappingPosition(mainRect, boardRect, pieceSize) {
     return { randomTop, randomLeft };
 }
 
-function createAndPlacePieces(count) {
+function createAndPlacePieces(numberOfPieces, backgroundImage) {
     const main = document.querySelector('main');
     const board = document.getElementById('board');
 
     const mainRect = main.getBoundingClientRect();
     const boardRect = board.getBoundingClientRect();
 
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < numberOfPieces; i++) {
         const piece = document.createElement('div');
         piece.classList.add('piece');
 
-        piece.style.height = `${Math.ceil(PIECE_SIZE * MASK_SIZE_MULTIPLIER)}px`;
-        piece.style.width = `${Math.ceil(PIECE_SIZE * MASK_SIZE_MULTIPLIER)}px`;
+        piece.style.height = `${Math.ceil(pieceSize * MASK_SIZE_MULTIPLIER)}px`;
+        piece.style.width = `${Math.ceil(pieceSize * MASK_SIZE_MULTIPLIER)}px`;
 
-        const row = Math.floor(i / COLUMNS);
-        const column = i % COLUMNS;
+        const row = Math.floor(i / columns);
+        const column = i % columns;
 
         const pieceType = getPieceType(row, column)
         piece.dataset.pieceType = pieceType;
         piece.style.maskImage = `url(#${pieceType})`;
 
-        piece.style.backgroundImage = `url('default.jpg')`;
+        piece.style.backgroundImage = `url(${backgroundImage})`;
         piece.style.backgroundRepeat = 'no-repeat';
-        piece.style.backgroundSize = `${BOARD_WIDTH}px ${BOARD_HEIGHT}px`;
-        const backgroundPosX = -column * PIECE_SIZE;
-        const backgroundPosY = -row * PIECE_SIZE;
+        piece.style.backgroundSize = `${boardWidth}px ${boardHeight}px`;
+        const backgroundPosX = -column * pieceSize;
+        const backgroundPosY = -row * pieceSize;
         piece.style.backgroundPosition = `${backgroundPosX}px ${backgroundPosY}px`;
 
         highestZIndex++;
@@ -186,7 +258,7 @@ function createAndPlacePieces(count) {
         piece.dataset.rotation = randomRotation;
         piece.style.transform = `rotate(${randomRotation}deg)`;
 
-        const { randomTop, randomLeft } = getRandomNonOverlappingPosition(mainRect, boardRect, PIECE_SIZE);
+        const { randomTop, randomLeft } = getRandomNonOverlappingPosition(mainRect, boardRect, pieceSize);
         piece.style.top = `${mainRect.top + randomTop}px`;
         piece.style.left = `${mainRect.left + randomLeft}px`;
 
@@ -251,8 +323,8 @@ function isPieceOverTheBoard(pieceRect, boardRect) {
 function isPositionOffTheBoard(targetLeft, targetTop, boardRect) {
     return (
         targetTop < boardRect.top ||
-        targetLeft + PIECE_SIZE > boardRect.right ||
-        targetTop + PIECE_SIZE > boardRect.bottom ||
+        targetLeft + pieceSize > boardRect.right ||
+        targetTop + pieceSize > boardRect.bottom ||
         targetLeft < boardRect.left
     );
 }
@@ -280,8 +352,8 @@ function isPositionValid(piece, targetLeft, targetTop, boardRect) {
     for (const side of sides) {
         const pieceSideType = getPieceSideType(piece, side);
 
-        const neighborLeft = targetLeft + SIDE_OFFSET_HORIZONTAL[side];
-        const neighborTop = targetTop + SIDE_OFFSET_VERTICAL[side];
+        const neighborLeft = targetLeft + sideOffsetHorizontal[side];
+        const neighborTop = targetTop + sideOffsetVertical[side];
 
         if (isPositionOffTheBoard(neighborLeft, neighborTop, boardRect)) {
             if (SIDE_TYPE.FLAT != COMPATIBLE_SIDE_TYPE[pieceSideType]) {
@@ -333,8 +405,8 @@ function snapToGrid(piece) {
 
     // TODO correct gaps from piece scaling (this will be a rabbit hole)
 
-    let snappedX = Math.round((pieceRect.left - boardRect.left) / PIECE_SIZE) * PIECE_SIZE;
-    let snappedY = Math.round((pieceRect.top - boardRect.top) / PIECE_SIZE) * PIECE_SIZE;
+    let snappedX = Math.round((pieceRect.left - boardRect.left) / pieceSize) * pieceSize;
+    let snappedY = Math.round((pieceRect.top - boardRect.top) / pieceSize) * pieceSize;
 
     const maxPieceLeft = boardRect.width - piece.offsetWidth;
     const maxPieceTop = boardRect.height - piece.offsetHeight;
