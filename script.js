@@ -1,4 +1,4 @@
-const MASK_SIZE_MULTIPLIER = 1 / 1; // 1 / 0.75 is the correct scale
+const MASK_SIZE_MULTIPLIER = 1 / 0.75;
 
 const DIFFICULTY = {
     EASY: {
@@ -52,6 +52,7 @@ const PIECE_TYPE_SIDES = {
 let rows;
 let columns;
 let pieceSize;
+let pieceOffset;
 let numberOfPieces;
 let boardHeight;
 let boardWidth;
@@ -118,10 +119,11 @@ function initializeGame(backgroundImage, difficulty) {
     rows = difficultySettings.ROWS;
     columns = difficultySettings.COLUMNS;
     pieceSize = difficultySettings.PIECE_SIZE;
+    pieceOffset = ((pieceSize * MASK_SIZE_MULTIPLIER) - pieceSize) / 2;
     numberOfPieces = rows * columns;
     boardHeight = rows * pieceSize;
     boardWidth = columns * pieceSize;
-    margin = pieceSize / 2;
+    margin = (pieceSize * MASK_SIZE_MULTIPLIER) / 2;
     sideOffsetHorizontal = [0, pieceSize, 0, -pieceSize];
     sideOffsetVertical = [-pieceSize, 0, pieceSize, 0];
     highestZIndex = 1;
@@ -247,8 +249,8 @@ function createAndPlacePieces(numberOfPieces, backgroundImage) {
         piece.style.backgroundImage = `url(${backgroundImage})`;
         piece.style.backgroundRepeat = 'no-repeat';
         piece.style.backgroundSize = `${boardWidth}px ${boardHeight}px`;
-        const backgroundPosX = -column * pieceSize;
-        const backgroundPosY = -row * pieceSize;
+        const backgroundPosX = -column * pieceSize + pieceOffset;
+        const backgroundPosY = -row * pieceSize + pieceOffset;
         piece.style.backgroundPosition = `${backgroundPosX}px ${backgroundPosY}px`;
 
         highestZIndex++;
@@ -259,8 +261,8 @@ function createAndPlacePieces(numberOfPieces, backgroundImage) {
         piece.style.transform = `rotate(${randomRotation}deg)`;
 
         const { randomTop, randomLeft } = getRandomNonOverlappingPosition(mainRect, boardRect, pieceSize);
-        piece.style.top = `${mainRect.top + randomTop}px`;
-        piece.style.left = `${mainRect.left + randomLeft}px`;
+        piece.style.top = `${mainRect.top + randomTop - pieceOffset}px`;
+        piece.style.left = `${mainRect.left + randomLeft - pieceOffset}px`;
 
         main.appendChild(piece);
         piece.addEventListener('click', togglePiece);
@@ -330,10 +332,18 @@ function isPositionOffTheBoard(targetLeft, targetTop, boardRect) {
 }
 
 function getPieceInPosition(targetLeft, targetTop) {
+    const tolerance = 1.0;
     const pieces = document.querySelectorAll('.piece');
     for (const piece of pieces) {
         const pieceRect = piece.getBoundingClientRect();
-        if (pieceRect.left === targetLeft && pieceRect.top === targetTop) {
+
+        const pieceLogicalLeft = pieceRect.left + pieceOffset;
+        const pieceLogicalTop = pieceRect.top + pieceOffset;
+
+        const leftMatch = Math.abs(pieceLogicalLeft - targetLeft) < tolerance;
+        const topMatch = Math.abs(pieceLogicalTop - targetTop) < tolerance;
+
+        if (leftMatch && topMatch) {
             return piece;
         }
     }
@@ -342,9 +352,11 @@ function getPieceInPosition(targetLeft, targetTop) {
 
 function getPieceSideType(piece, side) {
     const rotationOffset = (piece.dataset.rotation / 90) % 4;
+    const adjustedIndex = (side - rotationOffset + 4) % 4; 
+
     const pieceSideTypes = PIECE_TYPE_SIDES[piece.dataset.pieceType];
 
-    return pieceSideTypes.at(side - rotationOffset);
+    return pieceSideTypes[adjustedIndex];
 }
 
 function isPositionValid(piece, targetLeft, targetTop, boardRect) {
@@ -378,21 +390,6 @@ function isPositionValid(piece, targetLeft, targetTop, boardRect) {
     return true;
 }
 
-function isPositionEmpty(piece, targetLeft, targetTop) {
-    const pieces = document.querySelectorAll('.piece');
-    for (const otherPiece of pieces) {
-        if (otherPiece === piece) {
-            continue;
-        }
-
-        const otherPieceRect = otherPiece.getBoundingClientRect();
-        if (otherPieceRect.left === targetLeft && otherPieceRect.top === targetTop) {
-            return false;
-        }
-    }
-    return true;
-}
-
 function snapToGrid(piece) {
     const board = document.getElementById('board');
 
@@ -403,13 +400,14 @@ function snapToGrid(piece) {
         return;
     }
 
-    // TODO correct gaps from piece scaling (this will be a rabbit hole)
+    const pieceLogicalLeft = pieceRect.left + pieceOffset;
+    const pieceLogicalTop = pieceRect.top + pieceOffset;
 
-    let snappedX = Math.round((pieceRect.left - boardRect.left) / pieceSize) * pieceSize;
-    let snappedY = Math.round((pieceRect.top - boardRect.top) / pieceSize) * pieceSize;
-
-    const maxPieceLeft = boardRect.width - piece.offsetWidth;
-    const maxPieceTop = boardRect.height - piece.offsetHeight;
+    let snappedX = Math.round((pieceLogicalLeft - boardRect.left) / pieceSize) * pieceSize;
+    let snappedY = Math.round((pieceLogicalTop - boardRect.top) / pieceSize) * pieceSize;
+    
+    const maxPieceLeft = boardWidth - pieceSize;
+    const maxPieceTop = boardHeight - pieceSize;
 
     snappedX = Math.max(0, Math.min(snappedX, maxPieceLeft));
     snappedY = Math.max(0, Math.min(snappedY, maxPieceTop));
@@ -417,12 +415,15 @@ function snapToGrid(piece) {
     const targetLeft = boardRect.left + snappedX;
     const targetTop = boardRect.top + snappedY;
 
-    if (!isPositionEmpty(piece, targetLeft, targetTop)) {
+    const finalPhysicalLeft = targetLeft - pieceOffset;
+    const finalPhysicalTop = targetTop - pieceOffset;
+
+    if (getPieceInPosition(targetLeft, targetTop)) {
         return;
     }
 
     if (isPositionValid(piece, targetLeft, targetTop, boardRect)) {
-        piece.style.left = `${targetLeft}px`;
-        piece.style.top = `${targetTop}px`;
+        piece.style.left = `${finalPhysicalLeft}px`;
+        piece.style.top = `${finalPhysicalTop}px`;
     }
 }
