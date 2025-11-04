@@ -337,11 +337,11 @@ function getPieceInPosition(targetLeft, targetTop) {
     for (const piece of pieces) {
         const pieceRect = piece.getBoundingClientRect();
 
-        const pieceLogicalLeft = pieceRect.left + pieceOffset;
-        const pieceLogicalTop = pieceRect.top + pieceOffset;
+        const visibleLeft = pieceRect.left + pieceOffset;
+        const visibleTop = pieceRect.top + pieceOffset;
 
-        const leftMatch = Math.abs(pieceLogicalLeft - targetLeft) < tolerance;
-        const topMatch = Math.abs(pieceLogicalTop - targetTop) < tolerance;
+        const leftMatch = Math.abs(visibleLeft - targetLeft) < tolerance;
+        const topMatch = Math.abs(visibleTop - targetTop) < tolerance;
 
         if (leftMatch && topMatch) {
             return piece;
@@ -400,11 +400,11 @@ function snapToGrid(piece) {
         return;
     }
 
-    const pieceLogicalLeft = pieceRect.left + pieceOffset;
-    const pieceLogicalTop = pieceRect.top + pieceOffset;
+    const visibleLeft = pieceRect.left + pieceOffset;
+    const visibleTop = pieceRect.top + pieceOffset;
 
-    let snappedX = Math.round((pieceLogicalLeft - boardRect.left) / pieceSize) * pieceSize;
-    let snappedY = Math.round((pieceLogicalTop - boardRect.top) / pieceSize) * pieceSize;
+    let snappedX = Math.round((visibleLeft - boardRect.left) / pieceSize) * pieceSize;
+    let snappedY = Math.round((visibleTop - boardRect.top) / pieceSize) * pieceSize;
     
     const maxPieceLeft = boardWidth - pieceSize;
     const maxPieceTop = boardHeight - pieceSize;
@@ -415,15 +415,15 @@ function snapToGrid(piece) {
     const targetLeft = boardRect.left + snappedX;
     const targetTop = boardRect.top + snappedY;
 
-    const finalPhysicalLeft = targetLeft - pieceOffset;
-    const finalPhysicalTop = targetTop - pieceOffset;
+    const physicalLeft = targetLeft - pieceOffset;
+    const physicalTop = targetTop - pieceOffset;
 
     if (getPieceInPosition(targetLeft, targetTop)) {
         return;
     }
 
     if (isPositionValid(piece, targetLeft, targetTop, boardRect)) {
-        piece.style.left = `${finalPhysicalLeft}px`;
-        piece.style.top = `${finalPhysicalTop}px`;
+        piece.style.left = `${physicalLeft}px`;
+        piece.style.top = `${physicalTop    }px`;
     }
 }
