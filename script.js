@@ -85,21 +85,21 @@ document.addEventListener('DOMContentLoaded', () => {
     uploadInput.addEventListener('change', handleImageUpload);
 
     document.getElementById('easyButton').addEventListener('click', () => {
-        initializeGame(localStorage.getItem('backgroundImage') ?? '/images/default.jpg', 'EASY');
+        initializeGame(localStorage.getItem('backgroundImage') ?? './images/default.jpg', 'EASY');
         localStorage.setItem('difficulty', 'EASY');
     });
 
     document.getElementById('mediumButton').addEventListener('click', () => {
-        initializeGame(localStorage.getItem('backgroundImage') ?? '/images/default.jpg', 'MEDIUM');
+        initializeGame(localStorage.getItem('backgroundImage') ?? './images/default.jpg', 'MEDIUM');
         localStorage.setItem('difficulty', 'MEDIUM');
     });
 
     document.getElementById('hardButton').addEventListener('click', () => {
-        initializeGame(localStorage.getItem('backgroundImage') ?? '/images/default.jpg', 'HARD');
+        initializeGame(localStorage.getItem('backgroundImage') ?? './images/default.jpg', 'HARD');
         localStorage.setItem('difficulty', 'HARD');
     });
 
-    initializeGame(localStorage.getItem('backgroundImage') ?? '/images/default.jpg', localStorage.getItem('difficulty') ?? 'MEDIUM');
+    initializeGame(localStorage.getItem('backgroundImage') ?? './images/default.jpg', localStorage.getItem('difficulty') ?? 'MEDIUM');
 });
 
 function handleImageUpload(e) {
