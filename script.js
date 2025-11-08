@@ -424,6 +424,6 @@ function snapToGrid(piece) {
 
     if (isPositionValid(piece, targetLeft, targetTop, boardRect)) {
         piece.style.left = `${physicalLeft}px`;
-        piece.style.top = `${physicalTop    }px`;
+        piece.style.top = `${physicalTop}px`;
     }
 }
